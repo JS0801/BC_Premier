@@ -689,11 +689,9 @@ function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate,
         type: search.Type.ITEM_FULFILLMENT,
         filters: [
             ['createdfrom', 'anyof', String(storedSalesOrderId)],
-            'AND', ['mainline', 'is', 'F'],
-            'AND', ['taxline', 'is', 'F'],
-            'AND', ['shipping', 'is', 'F'],
             'AND', ['status', 'anyof', 'ItemShip:C'],
-            'AND', ['trandate', 'onorbefore', currentInvoiceDate]
+            'AND', ['trandate', 'onorbefore', currentInvoiceDate],
+            'AND', [LINE_NUM, 'isnotempty', '']
         ],
         columns: [
             search.createColumn({ name: 'internalid', sort: search.Sort.ASC }),
@@ -703,7 +701,6 @@ function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate,
             LINE_NUM
         ]
     }).run().each(function (row) {
-        log.audit('row', row)
         var lineNum = row.getValue(LINE_NUM);
         var qty = Math.abs(safeNum(row.getValue('quantity')));
         var rate = safeNum(commercialSoRateMap[lineNum]);
