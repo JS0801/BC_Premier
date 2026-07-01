@@ -675,55 +675,56 @@ function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate,
     var map = {};
     var storedSalesOrderId = getLinkedStoredSalesOrderId(commercialSalesOrderId);
 
-    if (!storedSalesOrderId || !currentInvoiceDate) {
-        log.audit('AIA stored release skipped', {
-            commercialSalesOrderId: commercialSalesOrderId,
-            storedSalesOrderId: storedSalesOrderId,
-            currentInvoiceDate: currentInvoiceDate
-        });
-        return map;
-    }
+    log.audit('AIA stored release search start', {
+        commercialSalesOrderId: commercialSalesOrderId,
+        storedSalesOrderId: storedSalesOrderId,
+        currentInvoiceDate: currentInvoiceDate,
+        commercialRateMap: commercialSoRateMap
+    });
+
+    if (!storedSalesOrderId || !currentInvoiceDate) return map;
 
     search.create({
-        type: 'transaction',
+        type: search.Type.ITEM_FULFILLMENT,
         filters: [
-            ['type', 'anyof', 'ItemShip'],
-            'AND', ['createdfrom', 'anyof', String(storedSalesOrderId)],
+            ['createdfrom', 'anyof', String(storedSalesOrderId)],
             'AND', ['mainline', 'is', 'F'],
             'AND', ['taxline', 'is', 'F'],
             'AND', ['shipping', 'is', 'F'],
             'AND', ['status', 'anyof', 'ItemShip:C'],
-            'AND', ['trandate', 'onorbefore', currentInvoiceDate],
-            'AND', [LINE_NUM, 'isnotempty', '']
+            'AND', ['trandate', 'onorbefore', currentInvoiceDate]
         ],
         columns: [
             search.createColumn({ name: 'internalid', sort: search.Sort.ASC }),
             'trandate',
-            LINE_NUM,
-            'quantity'
+            'item',
+            'quantity',
+            LINE_NUM
         ]
     }).run().each(function (row) {
         var lineNum = row.getValue(LINE_NUM);
-        if (!lineNum) return true;
-
         var qty = Math.abs(safeNum(row.getValue('quantity')));
         var rate = safeNum(commercialSoRateMap[lineNum]);
         var amount = Math.round(qty * rate * 100) / 100;
 
-        map[lineNum] = cleanPennies(Number(map[lineNum] || 0) + amount);
-
-        log.debug('AIA stored release line', {
+        log.audit('AIA stored release candidate line', {
             storedFulfillmentId: row.getValue('internalid'),
             trandate: row.getValue('trandate'),
-            line: lineNum,
+            item: row.getValue('item'),
+            lineKey: lineNum,
             quantity: qty,
             commercialRate: rate,
             releaseAmount: amount
         });
 
+        if (!lineNum) return true;
+        if (!rate) return true;
+
+        map[lineNum] = cleanPennies(Number(map[lineNum] || 0) + amount);
         return true;
     });
 
+    log.audit('AIA stored release final map', map);
     return map;
 }
 
