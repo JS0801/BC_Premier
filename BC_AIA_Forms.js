@@ -422,7 +422,7 @@ line.stored = cleanPennies(Number(invoiceStored || 0) - Number(storedReleased ||
                 line.prevApps   = Number(line.totalInvoiceTotal || 0) - Number(line.thisPeriod || 0);
             //  line.thisPeriod = lineStoredState.hasCurrent ? currentGross - Math.max(currentCpsm, 0) : 0;
             //  line.prevApps = Number(line.totalInvoiceTotal || 0) - Number(line.thisPeriod || 0) - Number(line.stored || 0);
-                line.totalToDate = Number(line.prevApps || 0) + Number(line.thisPeriod || 0) + Number(line.stored || 0);
+                line.totalToDate = Number(line.prevApps || 0) + Number(line.thisPeriod || 0)// + Number(line.stored || 0);
                 line.totalPercent = (line.soNewAmount == 0) ? 0 : ((line.totalToDate / line.soNewAmount) * 100).toFixed(2);
                 line.balanceToFinish = Number(line.soNewAmount || 0) - Number(line.totalToDate || 0);
 
