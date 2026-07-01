@@ -703,6 +703,7 @@ function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate,
             LINE_NUM
         ]
     }).run().each(function (row) {
+        log.audit('row', row)
         var lineNum = row.getValue(LINE_NUM);
         var qty = Math.abs(safeNum(row.getValue('quantity')));
         var rate = safeNum(commercialSoRateMap[lineNum]);
