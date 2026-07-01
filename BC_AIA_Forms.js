@@ -256,6 +256,7 @@ define(['N/ui/serverWidget', 'N/file', 'N/record', 'N/render', 'N/search', 'N/ht
             var storedMaterialState = getStoredMaterialLineState(CREATEDFROM, recId, PROJECTID);
             var storedRetainageSummary = getStoredMaterialRetainageSummary(recId, CREATEDFROM, PROJECTID);
             var commercialSoRateMap = getCommercialSoRateMap(CREATEDFROM);
+            log.debug('commercialSoRateMap', commercialSoRateMap)
 var storedReleaseMap = getStoredMaterialReleaseMap(CREATEDFROM, periodTo, commercialSoRateMap);
 
 log.audit('AIA stored material release helpers complete', {
