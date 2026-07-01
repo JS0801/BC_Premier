@@ -255,10 +255,14 @@ define(['N/ui/serverWidget', 'N/file', 'N/record', 'N/render', 'N/search', 'N/ht
             var retenPer = 0;
             var storedMaterialState = getStoredMaterialLineState(CREATEDFROM, recId, PROJECTID);
             var storedRetainageSummary = getStoredMaterialRetainageSummary(recId, CREATEDFROM, PROJECTID);
-            log.audit('AIA stored material helpers complete', {
-                stateLineCount: countKeys(storedMaterialState),
-                storedMaterialRetainage: storedRetainageSummary.SM
-            });
+            var commercialSoRateMap = getCommercialSoRateMap(CREATEDFROM);
+var storedReleaseMap = getStoredMaterialReleaseMap(CREATEDFROM, periodTo, commercialSoRateMap);
+
+log.audit('AIA stored material release helpers complete', {
+    salesOrderId: CREATEDFROM,
+    storedReleaseLineCount: countKeys(storedReleaseMap),
+    storedReleaseMap: storedReleaseMap
+});
             log.debug('PROJECTID',PROJECTID)
             log.debug('recId',recId)
             log.debug('CREATEDFROM',CREATEDFROM)
@@ -405,7 +409,14 @@ define(['N/ui/serverWidget', 'N/file', 'N/record', 'N/render', 'N/search', 'N/ht
 
 
 
-                line.stored = lineStoredState.hasCurrent ? lineStoredState.currentStored : (lineStoredState.latestStored || 0);
+                var invoiceStored = lineStoredState.hasCurrent ? lineStoredState.currentStored : (lineStoredState.latestStored || 0);
+var storedReleased = safeNum(storedReleaseMap[memoKey]);
+
+line.storedReleased = storedReleased;
+line.stored = cleanPennies(Number(invoiceStored || 0) - Number(storedReleased || 0));
+
+             // Optional later: if stored releases should reduce stored-material retainage too,
+             // subtract the release retainage impact from memoObj.TotalObj.SM after confirming the rule.
                 line.thisPeriod = lineStoredState.hasCurrent ? currentGross : 0;
                 line.prevApps   = Number(line.totalInvoiceTotal || 0) - Number(line.thisPeriod || 0);
             //  line.thisPeriod = lineStoredState.hasCurrent ? currentGross - Math.max(currentCpsm, 0) : 0;
@@ -425,7 +436,9 @@ define(['N/ui/serverWidget', 'N/file', 'N/record', 'N/render', 'N/search', 'N/ht
                     materialsPresentlyStored: line.stored,
                     totalCompletedAndStoredToDate: line.totalToDate,
                     balanceToFinish: line.balanceToFinish,
-                    retainage: line.totalInvoiceRetention
+                    retainage: line.totalInvoiceRetention,
+                    invoiceStoredMaterial: invoiceStored,
+                    storedMaterialReleased: storedReleased,
                 });
 
                 memoObj.TotalObj.soOldAmount = (memoObj.TotalObj.soOldAmount || 0) + (line.soOldAmount || 0);
@@ -598,6 +611,121 @@ define(['N/ui/serverWidget', 'N/file', 'N/record', 'N/render', 'N/search', 'N/ht
         function cleanPennies(n) {
             return Math.abs(Number(n || 0)) < 0.005 ? 0 : Number(n || 0);
         }
+
+      function getLookupInternalId(value) {
+    if (Array.isArray(value)) {
+        return value.length ? value[0].value : '';
+    }
+    if (value && typeof value === 'object') {
+        return value.value || '';
+    }
+    return value || '';
+}
+
+function getLinkedStoredSalesOrderId(commercialSalesOrderId) {
+    if (!commercialSalesOrderId) return '';
+
+    try {
+        var lookup = search.lookupFields({
+            type: search.Type.SALES_ORDER,
+            id: commercialSalesOrderId,
+            columns: ['custbody_abe_so']
+        });
+
+        return getLookupInternalId(lookup.custbody_abe_so);
+    } catch (e) {
+        log.debug('getLinkedStoredSalesOrderId error', e.toString());
+        return '';
+    }
+}
+
+function getCommercialSoRateMap(salesOrderId) {
+    var LINE_NUM = 'custcol_line_unique_key';
+    var map = {};
+
+    if (!salesOrderId) return map;
+
+    search.create({
+        type: 'transaction',
+        filters: [
+            ['type', 'anyof', 'SalesOrd'],
+            'AND', ['internalid', 'anyof', String(salesOrderId)],
+            'AND', ['mainline', 'is', 'F'],
+            'AND', ['taxline', 'is', 'F'],
+            'AND', ['shipping', 'is', 'F'],
+            'AND', [LINE_NUM, 'isnotempty', '']
+        ],
+        columns: [
+            LINE_NUM,
+            'rate'
+        ]
+    }).run().each(function (row) {
+        var lineNum = row.getValue(LINE_NUM);
+        if (lineNum) {
+            map[lineNum] = safeNum(row.getValue('rate'));
+        }
+        return true;
+    });
+
+    return map;
+}
+
+function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate, commercialSoRateMap) {
+    var LINE_NUM = 'custcol_line_unique_key';
+    var map = {};
+    var storedSalesOrderId = getLinkedStoredSalesOrderId(commercialSalesOrderId);
+
+    if (!storedSalesOrderId || !currentInvoiceDate) {
+        log.audit('AIA stored release skipped', {
+            commercialSalesOrderId: commercialSalesOrderId,
+            storedSalesOrderId: storedSalesOrderId,
+            currentInvoiceDate: currentInvoiceDate
+        });
+        return map;
+    }
+
+    search.create({
+        type: 'transaction',
+        filters: [
+            ['type', 'anyof', 'ItemShip'],
+            'AND', ['createdfrom', 'anyof', String(storedSalesOrderId)],
+            'AND', ['mainline', 'is', 'F'],
+            'AND', ['taxline', 'is', 'F'],
+            'AND', ['shipping', 'is', 'F'],
+            'AND', ['status', 'anyof', 'ItemShip:C'],
+            'AND', ['trandate', 'onorbefore', currentInvoiceDate],
+            'AND', [LINE_NUM, 'isnotempty', '']
+        ],
+        columns: [
+            search.createColumn({ name: 'internalid', sort: search.Sort.ASC }),
+            'trandate',
+            LINE_NUM,
+            'quantity'
+        ]
+    }).run().each(function (row) {
+        var lineNum = row.getValue(LINE_NUM);
+        if (!lineNum) return true;
+
+        var qty = Math.abs(safeNum(row.getValue('quantity')));
+        var rate = safeNum(commercialSoRateMap[lineNum]);
+        var amount = Math.round(qty * rate * 100) / 100;
+
+        map[lineNum] = cleanPennies(Number(map[lineNum] || 0) + amount);
+
+        log.debug('AIA stored release line', {
+            storedFulfillmentId: row.getValue('internalid'),
+            trandate: row.getValue('trandate'),
+            line: lineNum,
+            quantity: qty,
+            commercialRate: rate,
+            releaseAmount: amount
+        });
+
+        return true;
+    });
+
+    return map;
+}
 
         function getStoredMaterialLineState(salesOrderId, currentInvoiceId, projectId) {
             var LINE_NUM = 'custcol_line_unique_key';
