@@ -139,6 +139,7 @@ define(['N/record', 'N/search', 'N/ui', 'N/ui/dialog', 'N/runtime', 'N/task'],
                 var ordItem = itemArray[i].ordItem
                 var ordQty = itemArray[i].ordQty
                 var binNumber = itemArray[i].binNumber
+                var lineKey = itemArray[i].lineKey;
                 var itemT = itemArray[i].itemT
 
                 salesOrd.selectNewLine({
@@ -164,6 +165,13 @@ define(['N/record', 'N/search', 'N/ui', 'N/ui/dialog', 'N/runtime', 'N/task'],
                     fieldId: 'rate',
                     value: 0.00
                 });
+                if (lineKey) {
+                salesOrd.setCurrentSublistValue({
+                    sublistId: 'item',
+                    fieldId: 'custcol_line_unique_key',
+                    value: lineKey
+                });
+                }
 
                 salesOrd.commitLine({
                     sublistId: 'item'
@@ -254,6 +262,12 @@ define(['N/record', 'N/search', 'N/ui', 'N/ui/dialog', 'N/runtime', 'N/task'],
                         fieldId: 'custcol_pr_room_location',
                         line: l
                     })
+                    var lineKey = fulfillment.getSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'custcol_line_unique_key',
+                        line: l
+                    })
+                    
 
 
                     // var detailAvailable = fulfillment.getSublistValue({
@@ -283,6 +297,7 @@ define(['N/record', 'N/search', 'N/ui', 'N/ui/dialog', 'N/runtime', 'N/task'],
                     ifulLineObj.ordQty = ordQty
                     ifulLineObj.ordRate = ordRate
                     ifulLineObj.itemText = itemText
+                    ifulLineObj.lineKey = lineKey;
                     // ifulLineObj.binNumber = binNumber
                     ifulLineObj.sellRate = sellRate
                     ifulLineObj.itemT = itemT
