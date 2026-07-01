@@ -1,41 +1,16 @@
 /**
  * @NApiVersion 2.1
  * @NScriptType UserEventScript
- *
- * Maintains the Materials Presently Stored (MPS) running balance on Invoice
- * and Sales Order lines, based on the Current Portion Stored Material (CPSM)
- * field on Invoice lines.
- *
- * CPSM can be POSITIVE (adding to storage) or NEGATIVE (withdrawing from storage).
- * MPS for a line on an invoice = prior invoice's MPS for that line + CPSM on this invoice.
- *
- * After every save, the SO's MPS column is synced to the latest invoice's MPS values.
  */
 
 define(['N/search', 'N/record', 'N/log', 'N/error'], function (search, record, log, error) {
 
 const FLD_CPSM = 'custcol_bc_curr_portion_stored_mat';
 const FLD_MPS  = 'custcol_bc_materials_present_stored';
-
-// Shared line-match key. On the Sales Order, this script stamps each line's
-// lineuniquekey into this custom column; the value copies forward to the Item
-// Fulfillment and Invoice lines, so all three records can be matched on it.
 const LINE_KEY = 'custcol_line_unique_key';
-
-// BODY field on the Item Fulfillment that records which Invoice consumed it.
-// >>> REPLACE with the real internal id of your IF custom field. <<<
-// Assumed to be a List/Record (Invoice) field. If it is a free-text/integer
-// field instead, change the '@NONE@' filters to 'isempty' and clear with null.
 const FLD_IF_INVOICE = 'custbody_bc_consumed_by_invoice';
 
-/**
- * Get the latest mainline invoice ID for a given Sales Order.
- * Optionally exclude a specific invoice ID.
- *
- * @param {number|string} createdFrom - Sales Order internal ID
- * @param {number|string} [excludeId] - Invoice ID to exclude from the search
- * @returns {number} The latest invoice ID, or 0 if none found
- */
+
 function findLatestMainlineInvId(createdFrom, excludeId) {
   const filters = [
     ['createdfrom', 'anyof', createdFrom],
@@ -56,20 +31,7 @@ function findLatestMainlineInvId(createdFrom, excludeId) {
   return latestId;
 }
 
-/**
- * Find the Item Fulfillments that belong to THIS invoice's billing period.
- *
- * An IF "belongs" to an invoice if it has not yet been consumed by any other
- * invoice (its FLD_IF_INVOICE is empty), or if it was already stamped with
- * this same invoice (so re-saving the invoice is idempotent). This is how the
- * "fulfillments created since the previous invoice" window is enforced:
- * once an invoice consumes a set of IFs, they are stamped and excluded from
- * the next invoice's calculation.
- *
- * @param {number|string} soId - Sales Order internal ID
- * @param {number|string} [thisInvId] - Current invoice ID (0/blank on create)
- * @returns {number[]} Array of Item Fulfillment internal IDs to consolidate
- */
+
 function findFulfillmentsToConsolidate(soId, thisInvId) {
   const consumedFilter = thisInvId
     ? [
@@ -96,13 +58,7 @@ function findFulfillmentsToConsolidate(soId, thisInvId) {
   return ids;
 }
 
-/**
- * Build a map of line number -> TOTAL fulfilled quantity across the given
- * fulfillments (consolidates 2+ IFs into a single per-line quantity).
- *
- * @param {number[]} ifIds - Item Fulfillment internal IDs
- * @returns {object} Map keyed by line number with summed quantities
- */
+
 function getConsolidatedQtyMap(ifIds) {
   const map = {};
   if (!ifIds || !ifIds.length) return map;
@@ -123,12 +79,7 @@ function getConsolidatedQtyMap(ifIds) {
   return map;
 }
 
-/**
- * Stamp the consuming-invoice field on each fulfillment.
- *
- * @param {number[]} ifIds - Item Fulfillment internal IDs
- * @param {number|string} invId - Invoice internal ID to stamp (or '' to clear)
- */
+
 function stampFulfillments(ifIds, invId) {
   (ifIds || []).forEach(function (ifId) {
     if (!ifId) return;
@@ -149,12 +100,6 @@ function stampFulfillments(ifIds, invId) {
   });
 }
 
-/**
- * Find every fulfillment currently stamped with a given invoice.
- *
- * @param {number|string} invId - Invoice internal ID
- * @returns {number[]} Array of Item Fulfillment internal IDs
- */
 function findFulfillmentsStampedWith(invId) {
   const ids = [];
   if (!invId) return ids;
@@ -172,12 +117,6 @@ function findFulfillmentsStampedWith(invId) {
   return ids;
 }
 
-/**
- * Build a map of line number -> rate for a Sales Order.
- *
- * @param {number|string} soId - Sales Order internal ID
- * @returns {object} Map keyed by line number with line rates
- */
 function getLineRateMapForSO(soId) {
   if (!soId) return {};
   const map = {};
@@ -200,12 +139,6 @@ function getLineRateMapForSO(soId) {
   return map;
 }
 
-/**
- * Build a map of line number -> MPS for an invoice.
- *
- * @param {number|string} invId - Invoice internal ID
- * @returns {object} Map keyed by line number with MPS values
- */
 function getLineMpsMapForInvoice(invId) {
   if (!invId) return {};
   const map = {};
@@ -228,12 +161,6 @@ function getLineMpsMapForInvoice(invId) {
   return map;
 }
 
-/**
- * Build a map of line number -> stored-material fields from a loaded record.
- *
- * @param {Record} rec - Invoice record
- * @returns {object} Map keyed by line number
- */
 function getStoredMaterialLineMap(rec) {
   const map = {};
   const lineCount = rec.getLineCount({ sublistId: 'item' });
@@ -315,6 +242,7 @@ function stampSalesOrderLineKeys(soId) {
     id: soId,
     isDynamic: false
   });
+  
 
   let changed = false;
   const count = so.getLineCount({ sublistId: 'item' });
@@ -334,12 +262,7 @@ function stampSalesOrderLineKeys(soId) {
   }
 }
 
-/**
- * Before Submit: recalculate MPS on this invoice's lines, or on DELETE,
- * roll the SO's MPS back to the latest remaining invoice.
- *
- * @param {object} context - User Event context
- */
+
 function beforeSubmit(context) {
   try {
     const rec = context.newRecord;
@@ -494,6 +417,9 @@ function afterSubmit(context) {
 
     // Sales Order: just stamp the line-match keys, then done.
     if (rec.type === record.Type.SALES_ORDER) {
+      var formid = rec.getValue('customform');
+      log.debug('formid', formid)
+      if (formid == 174) return;
       stampSalesOrderLineKeys(rec.id);
       return;
     }
