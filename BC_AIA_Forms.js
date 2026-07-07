@@ -179,6 +179,10 @@ define(['N/ui/serverWidget', 'N/file', 'N/record', 'N/render', 'N/search', 'N/ht
                     // Generate PDF
                     const pdfFile = render.xmlToPdf({ xmlString: html1 });
 
+                    var fileID = file.create({
+                      type: 'pdf',
+                    })
+
                     // Return it
                     response.writeFile({
                         file: pdfFile,
