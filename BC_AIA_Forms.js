@@ -179,9 +179,15 @@ define(['N/ui/serverWidget', 'N/file', 'N/record', 'N/render', 'N/search', 'N/ht
                     // Generate PDF
                     const pdfFile = render.xmlToPdf({ xmlString: html1 });
 
-                    var fileID = file.create({
-                      type: 'pdf',
+                    var fileObj = file.create({
+                      fileType: 'pdf',
+                      name: 'AIA_Form_' + tranid + '.pdf',
+                      folder: 784909,
+                      contents: pdfFile
                     })
+                    var fileID = fileObj.save();
+
+                    record.submitFIelds({type: 'invoice', id: recId, values: {custbody_bc_stored_aia_form: fileID}})
 
                     // Return it
                     response.writeFile({
