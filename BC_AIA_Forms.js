@@ -183,7 +183,7 @@ define(['N/ui/serverWidget', 'N/file', 'N/record', 'N/render', 'N/search', 'N/ht
                     pdfFile.folder = 784909;
                     var fileID = pdfFile.save();
 
-                    record.submitFIelds({type: 'invoice', id: recId, values: {custbody_bc_stored_aia_form: fileID}})
+                    record.submitFields({type: 'invoice', id: recId, values: {custbody_bc_stored_aia_form: fileID}})
 
                     // Return it
                     response.writeFile({
