@@ -769,7 +769,16 @@ function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate,
     });
 
     if (!storedSalesOrderId || !currentInvoiceDate) return map;
-                                                                                                                            
+   var filters = [
+    ['createdfrom', 'anyof', String(storedSalesOrderId)],
+    'AND', ['status', 'anyof', 'ItemShip:C'],
+    'AND', ['trandate', 'onorbefore', currentInvoiceDate],
+    'AND', [LINE_NUM, 'isnotempty', '']
+];
+
+if (previousInvoiceDate) {
+    filters.push('AND', ['trandate', 'after', previousInvoiceDate]);
+}                                                                                                          
                                                                                                                             
                                                                                                                             
                                                                                                                             
@@ -778,12 +787,7 @@ function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate,
 
     search.create({
         type: search.Type.ITEM_FULFILLMENT,
-        filters: [
-            ['createdfrom', 'anyof', String(storedSalesOrderId)],
-            'AND', ['status', 'anyof', 'ItemShip:C'],
-            'AND', ['trandate', 'onorbefore', currentInvoiceDate],
-            'AND', [LINE_NUM, 'isnotempty', '']
-        ],
+        filters: filters,
         columns: [
             search.createColumn({ name: 'internalid', sort: search.Sort.ASC }),
             'trandate',
@@ -816,6 +820,46 @@ function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate,
 
     log.audit('AIA stored release final map', map);
     return map;
+}
+      function getPreviousInvoiceDate(commercialSalesOrderId, currentInvoiceId, projectId) {
+    var previousDate = '';
+
+    if (!commercialSalesOrderId || !currentInvoiceId) return previousDate;
+
+    var filters = [
+        ['type', 'anyof', 'CustInvc'],
+        'AND', ['mainline', 'is', 'T'],
+        'AND', ['internalidnumber', 'lessthan', currentInvoiceId],
+        'AND', [
+            ['createdfrom', 'anyof', String(commercialSalesOrderId)],
+            'OR',
+            ['createdfrom.createdfrom', 'anyof', String(commercialSalesOrderId)]
+        ]
+    ];
+
+    if (projectId) {
+        filters.push('AND', ['cseg_bc_project', 'anyof', projectId]);
+    }
+
+    search.create({
+        type: 'transaction',
+        filters: filters,
+        columns: [
+            search.createColumn({ name: 'trandate', sort: search.Sort.DESC }),
+            search.createColumn({ name: 'internalid', sort: search.Sort.DESC })
+        ]
+    }).run().each(function (row) {
+        previousDate = row.getValue('trandate');
+        return false;
+    });
+
+    log.audit('AIA previous invoice date', {
+        commercialSalesOrderId: commercialSalesOrderId,
+        currentInvoiceId: currentInvoiceId,
+        previousInvoiceDate: previousDate
+    });
+
+    return previousDate;
 }
 
         function getStoredMaterialLineState(salesOrderId, currentInvoiceId, projectId) {
