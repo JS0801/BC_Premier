@@ -156,6 +156,7 @@ define(['N/ui/serverWidget', 'N/file', 'N/record', 'N/render', 'N/search', 'N/ht
             <td align="right" style="width: 10%; font-size:11px; padding-top:7px; border-right: 1px solid black;">${formatNumber(row.thisPeriod)}</td>
             <td align="right" style="width: 10%; font-size:11px; padding-top:7px; border-right: 1px solid black;">${formatNumber(row.stored)}</td>
             <td align="right" style="width: 10%; font-size:11px; padding-top:7px; border-right: 1px solid black;">${formatNumber(row.totalToDate)}</td>
+            <td align="right" style="width: 10%; font-size:11px; padding-top:7px; border-right: 1px solid black;">${formatNumber(row.remainingStoredBalance)}</td>
             <td align="center" style="width: 5%; font-size:11px; padding-top:7px; border-right: 1px solid black;">${formatNumber(row.totalPercent)}</td>
             <td align="right" style="width: 10%; font-size:11px; padding-top:7px; border-right: 1px solid black;">${formatNumber(row.balanceToFinish)}</td>
             <td align="right" style="width: 11%; font-size:11px; padding-top:7px;">${formatNumber(row.totalInvoiceRetention)}</td>
@@ -169,6 +170,7 @@ define(['N/ui/serverWidget', 'N/file', 'N/record', 'N/render', 'N/search', 'N/ht
                     html1 = html1.replace(/{{ totals.workCompletedThisPeriod }}/g, formatNumber(searchObj.TotalObj.thisPeriod));
                     html1 = html1.replace(/{{ totals.materialsPresentlyStored }}/g, formatNumber(searchObj.TotalObj.stored));
                     html1 = html1.replace(/{{ totals.totalCompletedAndStoredToDate }}/g, formatNumber(searchObj.TotalObj.TCASTD));
+                    html1 = html1.replace(/{{ totals.remainingStoredBalance }}/g, formatNumber(searchObj.TotalObj.remainingStoredBalance));
                     html1 = html1.replace(/{{ totals.percent }}/g, formatNumber(searchObj.TotalObj.totalPercentTotal));
                     html1 = html1.replace(/{{ totals.balanceToFinish }}/g, formatNumber(searchObj.TotalObj.balanceToFinish));
                     html1 = html1.replace(/{{ totals.retainage }}/g, formatNumber(searchObj.TotalObj.totalInvoiceRetention));
@@ -416,19 +418,37 @@ log.audit('AIA stored material release helpers complete', {
 
 
 
+//                 var invoiceStored = lineStoredState.hasCurrent ? lineStoredState.currentStored : (lineStoredState.latestStored || 0);
+// var storedReleased = safeNum(storedReleaseMap[memoKey]);
+
+// line.storedReleased = storedReleased;
+// line.stored = cleanPennies(Number(invoiceStored || 0) - Number(storedReleased || 0));
+
+//              // Optional later: if stored releases should reduce stored-material retainage too,
+//              // subtract the release retainage impact from memoObj.TotalObj.SM after confirming the rule.
+//                 line.thisPeriod = lineStoredState.hasCurrent ? currentGross : 0;
+//                 line.prevApps   = Number(line.totalInvoiceTotal || 0) - Number(line.thisPeriod || 0);
+//             //  line.thisPeriod = lineStoredState.hasCurrent ? currentGross - Math.max(currentCpsm, 0) : 0;
+//             //  line.prevApps = Number(line.totalInvoiceTotal || 0) - Number(line.thisPeriod || 0) - Number(line.stored || 0);
+//                 line.totalToDate = Number(line.prevApps || 0) + Number(line.thisPeriod || 0)// + Number(line.stored || 0);
                 var invoiceStored = lineStoredState.hasCurrent ? lineStoredState.currentStored : (lineStoredState.latestStored || 0);
 var storedReleased = safeNum(storedReleaseMap[memoKey]);
 
-line.storedReleased = storedReleased;
-line.stored = cleanPennies(Number(invoiceStored || 0) - Number(storedReleased || 0));
+line.storedReleased = cleanPennies(storedReleased);
+line.remainingStoredBalance = cleanPennies(Number(invoiceStored || 0) - Number(storedReleased || 0));
 
-             // Optional later: if stored releases should reduce stored-material retainage too,
-             // subtract the release retainage impact from memoObj.TotalObj.SM after confirming the rule.
-                line.thisPeriod = lineStoredState.hasCurrent ? currentGross : 0;
-                line.prevApps   = Number(line.totalInvoiceTotal || 0) - Number(line.thisPeriod || 0);
-            //  line.thisPeriod = lineStoredState.hasCurrent ? currentGross - Math.max(currentCpsm, 0) : 0;
-            //  line.prevApps = Number(line.totalInvoiceTotal || 0) - Number(line.thisPeriod || 0) - Number(line.stored || 0);
-                line.totalToDate = Number(line.prevApps || 0) + Number(line.thisPeriod || 0)// + Number(line.stored || 0);
+// Column F = stored material this period only
+line.stored = cleanPennies(Number(currentCpsm || 0));
+
+// Column E = current invoice total minus this-period stored material
+line.thisPeriod = cleanPennies(Number(currentGross || 0) - Number(currentCpsm || 0));
+
+// Column D = previous invoice total, because currentGross is this invoice D/E/F activity
+line.prevApps = cleanPennies(Number(line.totalInvoiceTotal || 0) - Number(currentGross || 0));
+
+// Column G = D + E + F
+line.totalToDate = cleanPennies(Number(line.prevApps || 0) + Number(line.thisPeriod || 0) + Number(line.stored || 0));
+              
                 line.totalPercent = (line.soNewAmount == 0) ? 0 : ((line.totalToDate / line.soNewAmount) * 100).toFixed(2);
                 line.balanceToFinish = Number(line.soNewAmount || 0) - Number(line.totalToDate || 0);
 
@@ -460,6 +480,11 @@ line.stored = cleanPennies(Number(invoiceStored || 0) - Number(storedReleased ||
                 memoObj.TotalObj.prevApps = (memoObj.TotalObj.prevApps || 0) + (line.prevApps || 0);
                 memoObj.TotalObj.thisPeriod = (memoObj.TotalObj.thisPeriod || 0) + (line.thisPeriod || 0);
                 memoObj.TotalObj.stored = (memoObj.TotalObj.stored || 0) + (line.stored || 0);
+                memoObj.TotalObj.remainingStoredBalance =
+    (memoObj.TotalObj.remainingStoredBalance || 0) + (line.remainingStoredBalance || 0);
+
+memoObj.TotalObj.storedReleased =
+    (memoObj.TotalObj.storedReleased || 0) + (line.storedReleased || 0);
                 memoObj.TotalObj.TCASTD = (memoObj.TotalObj.TCASTD || 0) + (line.totalToDate || 0);
             }
 
