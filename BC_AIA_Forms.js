@@ -470,8 +470,16 @@ var storedReleased = safeNum(storedReleaseMap[memoKey]);
 
 line.storedReleased = cleanPennies(storedReleased);
 line.remainingStoredBalance = cleanPennies(Number(invoiceStored || 0) - Number(storedReleased || 0));
-line.stored = cleanPennies(Number(currentCpsm || 0));
-line.thisPeriod = cleanPennies(Number(currentGross || 0) - Number(currentCpsm || 0));
+var storedThisPeriod = cleanPennies(Number(currentCpsm || 0));
+var workThisPeriod = cleanPennies(Number(currentGross || 0) - storedThisPeriod);
+
+if (storedThisPeriod > 0 && Math.abs(workThisPeriod) <= 0.50) {
+    storedThisPeriod = cleanPennies(Number(currentGross || 0));
+    workThisPeriod = 0;
+}
+
+line.stored = storedThisPeriod;
+line.thisPeriod = workThisPeriod;
 line.prevApps = cleanPennies(Number(line.totalInvoiceTotal || 0) - Number(currentGross || 0));
 line.totalToDate = cleanPennies(Number(line.prevApps || 0) + Number(line.thisPeriod || 0) + Number(line.stored || 0));
               
