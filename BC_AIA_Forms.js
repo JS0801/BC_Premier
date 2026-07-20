@@ -334,6 +334,10 @@ search.createColumn({
     name: "custcol_bc_curr_portion_stored_mat",
     summary: "SUM"
 }));
+              memoObj[memo].currentInvoiceTotal = parseFloat(result.getValue({
+    name: "formulanumeric",
+    summary: "SUM"
+})) || 0;
 
 memoObj[memo].currentMps = safeNum(result.getValue({
     name: "custcol_bc_materials_present_stored",
