@@ -777,7 +777,7 @@ function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate,
 ];
 
 if (previousInvoiceDate) {
-    filters.push('AND', ['trandate', 'after', previousInvoiceDate]);
+    filters.push('AND', ['trandate', 'onorafter', previousInvoiceDate]);
 }                                                                                                          
                                                                                                                             
                                                                                                                             
