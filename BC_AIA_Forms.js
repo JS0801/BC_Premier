@@ -300,10 +300,18 @@ log.audit('AIA stored material release helpers complete', {
                         formula: "{amount} + NVL({custcol_bc_sov_unbilled_retention},0)"
                     }),
                     search.createColumn({
-                        name: "formulanumeric5",
-                        summary: "MAX",
-                        formula: "NVL({custcol_bc_sov_unbilled_retention},0)"
-                    })
+    name: "formulanumeric5",
+    summary: "MAX",
+    formula: "NVL({custcol_bc_sov_unbilled_retention},0)"
+}),
+search.createColumn({
+    name: "custcol_bc_curr_portion_stored_mat",
+    summary: "SUM"
+}),
+search.createColumn({
+    name: "custcol_bc_materials_present_stored",
+    summary: "SUM"
+})
                 ]
             });
 
@@ -318,7 +326,21 @@ log.audit('AIA stored material release helpers complete', {
 
                 memoObj[memo].currentInvoiceNetAmount = parseFloat(result.getValue({ name: "amount", summary: "SUM" })) || 0;
                 memoObj[memo].currentInvoiceRetention = parseFloat(result.getValue({ name: "custcol_bc_sov_unbilled_retention", summary: "SUM" })) || 0;
-                memoObj[memo].currentInvoiceTotal = parseFloat(result.getValue({ name: "formulanumeric", summary: "SUM" })) || 0;
+                memoObj[memo].currentCpsm = safeNum(result.getValue({
+    name: "custcol_bc_curr_portion_stored_mat",
+    summary: "SUM"
+}));
+
+memoObj[memo].currentMps = safeNum(result.getValue({
+    name: "custcol_bc_materials_present_stored",
+    summary: "SUM"
+}));
+
+log.audit('AIA current invoice stored fields', {
+    line: memo,
+    currentCpsm: memoObj[memo].currentCpsm,
+    currentMps: memoObj[memo].currentMps
+});
                 if (searchPer > retenPer) retenPer = searchPer;
                 log.debug('AIA current invoice line totals', {
                     line: memo,
@@ -412,41 +434,37 @@ log.audit('AIA stored material release helpers complete', {
 
                 var line = memoObj[memoKey];
                 var lineStoredState = storedMaterialState[memoKey] || {};
-                var currentCpsm = lineStoredState.hasCurrent ? lineStoredState.currentCpsm : 0;
+                var currentCpsm = line.hasOwnProperty('currentCpsm')
+    ? safeNum(line.currentCpsm)
+    : (lineStoredState.hasCurrent ? lineStoredState.currentCpsm : 0);
                 var currentGross = Number(line.currentInvoiceTotal || 0);
 
 
 
 
 //                 var invoiceStored = lineStoredState.hasCurrent ? lineStoredState.currentStored : (lineStoredState.latestStored || 0);
-// var storedReleased = safeNum(storedReleaseMap[memoKey]);
+//                 var storedReleased = safeNum(storedReleaseMap[memoKey]);
 
-// line.storedReleased = storedReleased;
-// line.stored = cleanPennies(Number(invoiceStored || 0) - Number(storedReleased || 0));
+//                 line.storedReleased = storedReleased;
+//                 line.stored = cleanPennies(Number(invoiceStored || 0) - Number(storedReleased || 0));
 
-//              // Optional later: if stored releases should reduce stored-material retainage too,
-//              // subtract the release retainage impact from memoObj.TotalObj.SM after confirming the rule.
+//                 Optional later: if stored releases should reduce stored-material retainage too,
+//                 subtract the release retainage impact from memoObj.TotalObj.SM after confirming the rule.
 //                 line.thisPeriod = lineStoredState.hasCurrent ? currentGross : 0;
 //                 line.prevApps   = Number(line.totalInvoiceTotal || 0) - Number(line.thisPeriod || 0);
-//             //  line.thisPeriod = lineStoredState.hasCurrent ? currentGross - Math.max(currentCpsm, 0) : 0;
-//             //  line.prevApps = Number(line.totalInvoiceTotal || 0) - Number(line.thisPeriod || 0) - Number(line.stored || 0);
+//                 line.thisPeriod = lineStoredState.hasCurrent ? currentGross - Math.max(currentCpsm, 0) : 0;
+//                 line.prevApps = Number(line.totalInvoiceTotal || 0) - Number(line.thisPeriod || 0) - Number(line.stored || 0);
 //                 line.totalToDate = Number(line.prevApps || 0) + Number(line.thisPeriod || 0)// + Number(line.stored || 0);
-                var invoiceStored = lineStoredState.hasCurrent ? lineStoredState.currentStored : (lineStoredState.latestStored || 0);
+var invoiceStored = line.hasOwnProperty('currentMps')
+    ? safeNum(line.currentMps)
+    : (lineStoredState.hasCurrent ? lineStoredState.currentStored : (lineStoredState.latestStored || 0));
 var storedReleased = safeNum(storedReleaseMap[memoKey]);
 
 line.storedReleased = cleanPennies(storedReleased);
 line.remainingStoredBalance = cleanPennies(Number(invoiceStored || 0) - Number(storedReleased || 0));
-
-// Column F = stored material this period only
 line.stored = cleanPennies(Number(currentCpsm || 0));
-
-// Column E = current invoice total minus this-period stored material
 line.thisPeriod = cleanPennies(Number(currentGross || 0) - Number(currentCpsm || 0));
-
-// Column D = previous invoice total, because currentGross is this invoice D/E/F activity
 line.prevApps = cleanPennies(Number(line.totalInvoiceTotal || 0) - Number(currentGross || 0));
-
-// Column G = D + E + F
 line.totalToDate = cleanPennies(Number(line.prevApps || 0) + Number(line.thisPeriod || 0) + Number(line.stored || 0));
               
                 line.totalPercent = (line.soNewAmount == 0) ? 0 : ((line.totalToDate / line.soNewAmount) * 100).toFixed(2);
@@ -480,8 +498,7 @@ line.totalToDate = cleanPennies(Number(line.prevApps || 0) + Number(line.thisPer
                 memoObj.TotalObj.prevApps = (memoObj.TotalObj.prevApps || 0) + (line.prevApps || 0);
                 memoObj.TotalObj.thisPeriod = (memoObj.TotalObj.thisPeriod || 0) + (line.thisPeriod || 0);
                 memoObj.TotalObj.stored = (memoObj.TotalObj.stored || 0) + (line.stored || 0);
-                memoObj.TotalObj.remainingStoredBalance =
-    (memoObj.TotalObj.remainingStoredBalance || 0) + (line.remainingStoredBalance || 0);
+                memoObj.TotalObj.remainingStoredBalance = (memoObj.TotalObj.remainingStoredBalance || 0) + (line.remainingStoredBalance || 0);
 
 memoObj.TotalObj.storedReleased =
     (memoObj.TotalObj.storedReleased || 0) + (line.storedReleased || 0);
