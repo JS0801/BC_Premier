@@ -286,8 +286,12 @@ log.audit('AIA stored material release helpers complete', {
                     "AND", ["mainline", "is", "F"],
                     "AND", ["taxline", "is", "F"],
                     "AND", ["shipping", "is", "F"],
-                    "AND", ["createdfrom", "anyof", CREATEDFROM],
-                    "AND", ["createdfrom.mainline", "is", "T"]
+                    "AND", [
+    ["createdfrom", "anyof", CREATEDFROM],
+    "OR",
+    ["createdfrom.createdfrom", "anyof", CREATEDFROM]
+],
+"AND", ["createdfrom.mainline", "is", "T"]
                 ],
                 columns: [
                     search.createColumn({ name: "custcol_line_unique_key", summary: "GROUP", sort: search.Sort.ASC }),
