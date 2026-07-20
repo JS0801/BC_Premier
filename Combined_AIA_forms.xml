@@ -342,77 +342,83 @@
     </div>
 
       <table border="1px solid black" style="width: 100%;">
-        <tr style="width: 100%;">
+               <tr style="width: 100%;">
             <td align="center" style="width: 5%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">A</td>
-            <td align="center" style="width: 20%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">B</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">C</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">D</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">E</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">F</td>
-            <td align="right" style="width: 10%; font-size:11px; padding-right: 15px; margin: 0px; vertical-align: bottom; border-bottom: 1px solid black;">G</td>
+            <td align="center" style="width: 18%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">B</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">C</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">D</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">E</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">F</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">G</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">G-1</td>
             <td align="center" style="width: 5%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">H</td>
-            <td align="center" style="width: 11%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-bottom: 1px solid black;">I</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-right: 1px solid black; border-bottom: 1px solid black;">H</td>
+            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; vertical-align: bottom; border-bottom: 1px solid black;">I</td>
         </tr>
         <tr style="width: 100%;">
             <td align="center" style="width: 5%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">ITEM</td>
-            <td align="center" style="width: 20%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">DESCRIPTION OF WORK</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">SCHEDULED</td>
-            <td align="center" colspan="2" style="width: 20%; font-size:11px; padding: 0px; margin: 0px; vertical-align: middle; border-right: 1px solid black; border-bottom: 1px solid black;">WORK COMPLETED</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">MATERIALS</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">TOTAL</td>
+            <td align="center" style="width: 18%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">DESCRIPTION OF WORK</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">SCHEDULED</td>
+            <td align="center" colspan="2" style="width: 18%; font-size:11px; padding: 0px; margin: 0px; vertical-align: middle; border-right: 1px solid black; border-bottom: 1px solid black;">WORK COMPLETED</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">MATERIALS</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">TOTAL</td>
+            <td align="center" style="width: 9%; font-size:10px; padding: 0px; margin: 0px; border-right: 1px solid black;">REMAINING</td>
             <td align="center" style="width: 5%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">%</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">BALANCE</td>
-            <td align="center" style="width: 11%; font-size:11px; padding: 0px; margin: 0px;">RETAINAGE</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">BALANCE</td>
+            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px;">RETAINAGE</td>
         </tr>
         <tr style="width: 100%;">
             <td align="center" style="width: 5%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">NO.</td>
-            <td align="center" style="width: 20%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;"></td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">VALUE</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">FROM PREVIOUS</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">THIS PERIOD</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">PRESENTLY</td>
-            <td align="center" style="width: 10%; font-size:10px; padding: 0px; margin: 0px; border-right: 1px solid black;">COMPLETED</td>
+            <td align="center" style="width: 18%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;"></td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">VALUE</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">FROM PREVIOUS</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">THIS PERIOD</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">STORED</td>
+            <td align="center" style="width: 9%; font-size:10px; padding: 0px; margin: 0px; border-right: 1px solid black;">COMPLETED</td>
+            <td align="center" style="width: 9%; font-size:10px; padding: 0px; margin: 0px; border-right: 1px solid black;">STORED</td>
             <td align="center" style="width: 5%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">(G / C)</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">TO FINISH</td>
-            <td align="center" style="width: 11%; font-size:11px; padding: 0px; margin: 0px;"></td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">TO FINISH</td>
+            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px;"></td>
         </tr>
         <tr style="width: 100%;">
             <td align="center" style="width: 5%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;"></td>
-            <td align="center" style="width: 20%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;"></td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;"></td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">APPLICATIONS</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;"></td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">STORED (NOT</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">TO DATE</td>
+            <td align="center" style="width: 18%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;"></td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;"></td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">APPLICATIONS</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;"></td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">THIS PERIOD</td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">TO DATE</td>
+            <td align="center" style="width: 9%; font-size:10px; padding: 0px; margin: 0px; border-right: 1px solid black;">BALANCE</td>
             <td align="center" style="width: 5%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;"></td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">(C - G)</td>
-            <td align="center" style="width: 11%; font-size:11px; padding: 0px; margin: 0px;"></td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black;">(C - G)</td>
+            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px;"></td>
         </tr>
         <tr style="width: 100%;">
             <td align="center" style="width: 5%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
-            <td align="center" style="width: 20%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;">(D+E)</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;">IN D OR E)</td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;">(D+E)</td>
+            <td align="center" style="width: 18%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;">(D+E+F)</td>
+            <td align="center" style="width: 9%; font-size:10px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
             <td align="center" style="width: 5%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
-            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
-            <td align="center" style="width: 11%; font-size:11px; padding: 0px; margin: 0px; border-bottom: 1px solid black;"></td>
+            <td align="center" style="width: 9%; font-size:11px; padding: 0px; margin: 0px; border-right: 1px solid black; border-bottom: 1px solid black;"></td>
+            <td align="center" style="width: 10%; font-size:11px; padding: 0px; margin: 0px; border-bottom: 1px solid black;"></td>
         </tr>
         <!-- ROWS GO HERE -->
-        <tr line-height="200%">
+                <tr line-height="200%">
             <td align="center" style="width: 5%; font-size:11px; padding-top:7px; border-right: 1px solid black;">&#160;</td>
-            <td align="center" style="width: 20%; font-size:11px; padding-top:7px; border-right: 1px solid black;">GRAND TOTAL</td>
-            <td align="right" style="width: 10%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.scheduledValue }}</td>
-            <td align="right" style="width: 10%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.workCompletedFromPreviousApplication }}</td>
-            <td align="right" style="width: 10%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.workCompletedThisPeriod }}</td>
-            <td align="right" style="width: 10%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.materialsPresentlyStored }}</td>
-            <td align="right" style="width: 10%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.totalCompletedAndStoredToDate }}</td>
+            <td align="center" style="width: 18%; font-size:11px; padding-top:7px; border-right: 1px solid black;">GRAND TOTAL</td>
+            <td align="right" style="width: 9%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.scheduledValue }}</td>
+            <td align="right" style="width: 9%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.workCompletedFromPreviousApplication }}</td>
+            <td align="right" style="width: 9%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.workCompletedThisPeriod }}</td>
+            <td align="right" style="width: 9%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.materialsPresentlyStored }}</td>
+            <td align="right" style="width: 9%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.totalCompletedAndStoredToDate }}</td>
+            <td align="right" style="width: 9%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.remainingStoredBalance }}</td>
             <td align="center" style="width: 5%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.percent }}</td>
-            <td align="right" style="width: 10%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.balanceToFinish }}</td>
-            <td align="right" style="width: 11%; font-size:11px; padding-top:7px;">{{ totals.retainage }}</td>
+            <td align="right" style="width: 9%; font-size:11px; padding-top:7px; border-right: 1px solid black;">{{ totals.balanceToFinish }}</td>
+            <td align="right" style="width: 10%; font-size:11px; padding-top:7px;">{{ totals.retainage }}</td>
         </tr>
       </table>
   </body>
