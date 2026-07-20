@@ -827,6 +827,70 @@ function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate,
 
                 return true;
             });
+           var directCurrentRowCount = 0;
+var directCurrentState = {};
+
+try {
+    var currentInvoiceRec = record.load({
+        type: record.Type.INVOICE,
+        id: currentInvoiceId,
+        isDynamic: false
+    });
+
+    var invLineCount = currentInvoiceRec.getLineCount({ sublistId: 'item' });
+
+    for (var i = 0; i < invLineCount; i++) {
+        var directLineNum = currentInvoiceRec.getSublistValue({
+            sublistId: 'item',
+            fieldId: LINE_NUM,
+            line: i
+        });
+
+        if (!directLineNum) continue;
+        directCurrentRowCount++;
+
+        directCurrentState[directLineNum] = directCurrentState[directLineNum] || {
+            currentCpsm: 0,
+            currentStored: 0
+        };
+
+        directCurrentState[directLineNum].currentCpsm += safeNum(currentInvoiceRec.getSublistValue({
+            sublistId: 'item',
+            fieldId: FLD_CURRSM,
+            line: i
+        }));
+
+        directCurrentState[directLineNum].currentStored += safeNum(currentInvoiceRec.getSublistValue({
+            sublistId: 'item',
+            fieldId: FLD_MPS,
+            line: i
+        }));
+    }
+
+    Object.keys(directCurrentState).forEach(function (lineNum) {
+        if (!state[lineNum]) {
+            state[lineNum] = {
+                hasCurrent: false,
+                currentCpsm: 0,
+                currentStored: 0,
+                latestStored: 0,
+                latestStoredInvoiceId: 0
+            };
+        }
+
+        state[lineNum].hasCurrent = true;
+        state[lineNum].currentCpsm = directCurrentState[lineNum].currentCpsm;
+        state[lineNum].currentStored = directCurrentState[lineNum].currentStored;
+    });
+
+    log.audit('AIA direct current invoice stored state', {
+        invoiceId: currentInvoiceId,
+        directCurrentRowCount: directCurrentRowCount,
+        directCurrentState: directCurrentState
+    });
+} catch (e) {
+    log.debug('AIA direct current invoice stored state error', e.toString());
+}
 
             log.audit('AIA stored material state built', {
                 salesOrderId: salesOrderId,
