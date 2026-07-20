@@ -117,6 +117,11 @@ define(['N/search', 'N/runtime', 'N/record', 'N/task', 'N/file', 'N/email', 'N/r
                        fieldId: 'custcol_unique_key_link',
                        line: l
                     });
+                    var lineUnqKey = fulfillment.getSublistValue({
+                       sublistId: 'item',
+                       fieldId: 'custcol_line_unique_key',
+                       line: l
+                    });
                     var ordQty = fulfillment.getSublistValue({
                         sublistId: 'item',
                         fieldId: 'quantity',
@@ -181,6 +186,7 @@ define(['N/search', 'N/runtime', 'N/record', 'N/task', 'N/file', 'N/email', 'N/r
                     itemObj.roomLocation = roomLocation;
                     itemObj.binNumber = binNumberArray;
                     itemObj.binQty = binQtyArray;
+                    itemObj.lineUnqKey = lineUnqKey;
                     itemArray.push(itemObj);
                 }
                 return itemArray;
@@ -404,6 +410,11 @@ define(['N/search', 'N/runtime', 'N/record', 'N/task', 'N/file', 'N/email', 'N/r
                           value: lineKey
                       });
                     }
+                    salesOrd.setCurrentSublistValue({
+                          sublistId: 'item',
+                          fieldId: 'custcol_line_unique_key',
+                          value: lineUnqKey
+                      });
                     salesOrd.commitLine({
                         sublistId: 'item'
                     });
