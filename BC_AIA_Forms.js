@@ -263,9 +263,23 @@ define(['N/ui/serverWidget', 'N/file', 'N/record', 'N/render', 'N/search', 'N/ht
             var retenPer = 0;
             var storedMaterialState = getStoredMaterialLineState(CREATEDFROM, recId, PROJECTID);
             var storedRetainageSummary = getStoredMaterialRetainageSummary(recId, CREATEDFROM, PROJECTID);
-            var commercialSoRateMap = getCommercialSoRateMap(CREATEDFROM);
-            log.debug('commercialSoRateMap', commercialSoRateMap)
-var storedReleaseMap = getStoredMaterialReleaseMap(CREATEDFROM, periodTo, commercialSoRateMap);
+var commercialSoRateMap = getCommercialSoRateMap(CREATEDFROM);
+log.debug('commercialSoRateMap', commercialSoRateMap);
+
+var previousInvoiceDate = getPreviousInvoiceDate(CREATEDFROM, recId, PROJECTID);
+
+var storedReleaseThisPeriodMap = getStoredMaterialReleaseMap(
+    CREATEDFROM,
+    periodTo,
+    commercialSoRateMap,
+    previousInvoiceDate
+);
+
+var storedReleaseMap = getStoredMaterialReleaseMap(
+    CREATEDFROM,
+    periodTo,
+    commercialSoRateMap
+);
 
 log.audit('AIA stored material release helpers complete', {
     salesOrderId: CREATEDFROM,
@@ -467,20 +481,28 @@ var invoiceStored = line.hasOwnProperty('currentMps')
     ? safeNum(line.currentMps)
     : (lineStoredState.hasCurrent ? lineStoredState.currentStored : (lineStoredState.latestStored || 0));
 var storedReleased = safeNum(storedReleaseMap[memoKey]);
+var storedReleasedThisPeriod = safeNum(storedReleaseThisPeriodMap[memoKey]);
 
 line.storedReleased = cleanPennies(storedReleased);
+line.storedReleasedThisPeriod = cleanPennies(storedReleasedThisPeriod);
 line.remainingStoredBalance = cleanPennies(Number(invoiceStored || 0) - Number(storedReleased || 0));
-var storedThisPeriod = cleanPennies(Number(currentCpsm || 0));
-var workThisPeriod = cleanPennies(Number(currentGross || 0) - storedThisPeriod);
 
-if (storedThisPeriod > 0 && Math.abs(workThisPeriod) <= 0.50) {
+var storedThisPeriod = cleanPennies(Number(currentCpsm || 0)); // Column F
+var directWorkThisPeriod = cleanPennies(Number(currentGross || 0) - storedThisPeriod);
+
+if (storedThisPeriod > 0 && Math.abs(directWorkThisPeriod) <= 0.50) {
     storedThisPeriod = cleanPennies(Number(currentGross || 0));
-    workThisPeriod = 0;
+    directWorkThisPeriod = 0;
 }
+
+var workThisPeriod = cleanPennies(Number(directWorkThisPeriod || 0) + Number(storedReleasedThisPeriod || 0)); // Column E
+
+var previousInvoiceGross = cleanPennies(Number(line.totalInvoiceTotal || 0) - Number(currentGross || 0));
+var previousReleased = cleanPennies(Number(storedReleased || 0) - Number(storedReleasedThisPeriod || 0));
 
 line.stored = storedThisPeriod;
 line.thisPeriod = workThisPeriod;
-line.prevApps = cleanPennies(Number(line.totalInvoiceTotal || 0) - Number(currentGross || 0));
+line.prevApps = cleanPennies(previousInvoiceGross + previousReleased);
 line.totalToDate = cleanPennies(Number(line.prevApps || 0) + Number(line.thisPeriod || 0) + Number(line.stored || 0));
               
                 line.totalPercent = (line.soNewAmount == 0) ? 0 : ((line.totalToDate / line.soNewAmount) * 100).toFixed(2);
@@ -735,8 +757,7 @@ function getCommercialSoRateMap(salesOrderId) {
     return map;
 }
 
-function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate, commercialSoRateMap) {
-    var LINE_NUM = 'custcol_line_unique_key';
+function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate, commercialSoRateMap, previousInvoiceDate) {    var LINE_NUM = 'custcol_line_unique_key';
     var map = {};
     var storedSalesOrderId = getLinkedStoredSalesOrderId(commercialSalesOrderId);
 
@@ -748,6 +769,12 @@ function getStoredMaterialReleaseMap(commercialSalesOrderId, currentInvoiceDate,
     });
 
     if (!storedSalesOrderId || !currentInvoiceDate) return map;
+                                                                                                                            
+                                                                                                                            
+                                                                                                                            
+                                                                                                                            
+                                                                                                                            
+                                                                                                                            
 
     search.create({
         type: search.Type.ITEM_FULFILLMENT,
