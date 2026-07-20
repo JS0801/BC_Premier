@@ -114,7 +114,7 @@ define(['N/search', 'N/runtime', 'N/record', 'N/task', 'N/file', 'N/email', 'N/r
                     });
                     var lineKey = fulfillment.getSublistValue({
                        sublistId: 'item',
-                       fieldId: 'custcol_line_unique_key',
+                       fieldId: 'custcol_unique_key_link',
                        line: l
                     });
                     var ordQty = fulfillment.getSublistValue({
@@ -400,7 +400,7 @@ define(['N/search', 'N/runtime', 'N/record', 'N/task', 'N/file', 'N/email', 'N/r
                     if (lineKey) {
                       salesOrd.setCurrentSublistValue({
                           sublistId: 'item',
-                          fieldId: 'custcol_line_unique_key',
+                          fieldId: 'custcol_unique_key_link',
                           value: lineKey
                       });
                     }
