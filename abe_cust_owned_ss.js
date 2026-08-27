@@ -112,16 +112,6 @@ define(['N/search', 'N/runtime', 'N/record', 'N/task', 'N/file', 'N/email', 'N/r
                         fieldId: 'item',
                         line: l
                     });
-                    var lineKey = fulfillment.getSublistValue({
-                       sublistId: 'item',
-                       fieldId: 'custcol_unique_key_link',
-                       line: l
-                    });
-                    var lineUnqKey = fulfillment.getSublistValue({
-                       sublistId: 'item',
-                       fieldId: 'custcol_line_unique_key',
-                       line: l
-                    });
                     var ordQty = fulfillment.getSublistValue({
                         sublistId: 'item',
                         fieldId: 'quantity',
@@ -182,11 +172,9 @@ define(['N/search', 'N/runtime', 'N/record', 'N/task', 'N/file', 'N/email', 'N/r
                     itemObj.ordItem = ordItem;
                     itemObj.itemT = itemT;
                     itemObj.ordQty = ordQty;
-                    itemObj.lineKey = lineKey;
                     itemObj.roomLocation = roomLocation;
                     itemObj.binNumber = binNumberArray;
                     itemObj.binQty = binQtyArray;
-                    itemObj.lineUnqKey = lineUnqKey;
                     itemArray.push(itemObj);
                 }
                 return itemArray;
@@ -367,7 +355,6 @@ define(['N/search', 'N/runtime', 'N/record', 'N/task', 'N/file', 'N/email', 'N/r
                 var ordQty = itemArray[i].ordQty;
                 var itemT = itemArray[i].itemT;
                 var roomLoc = itemArray[i].roomLocation;
-                var lineKey = itemArray[i].lineKey;
                 if (itemT == 'InvtPart') {
                     salesOrd.selectNewLine({
                         sublistId: 'item'
@@ -403,18 +390,6 @@ define(['N/search', 'N/runtime', 'N/record', 'N/task', 'N/file', 'N/email', 'N/r
                         fieldId: 'rate',
                         value: 0.00
                     });
-                    if (lineKey) {
-                      salesOrd.setCurrentSublistValue({
-                          sublistId: 'item',
-                          fieldId: 'custcol_unique_key_link',
-                          value: lineKey
-                      });
-                    }
-                    salesOrd.setCurrentSublistValue({
-                          sublistId: 'item',
-                          fieldId: 'custcol_line_unique_key',
-                          value: lineUnqKey
-                      });
                     salesOrd.commitLine({
                         sublistId: 'item'
                     });
