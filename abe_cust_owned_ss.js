@@ -390,6 +390,11 @@ define(['N/search', 'N/runtime', 'N/record', 'N/task', 'N/file', 'N/email', 'N/r
                         fieldId: 'rate',
                         value: 0.00
                     });
+                    salesOrd.setCurrentSublistValue({
+                        sublistId: 'item',
+                        fieldId: 'custcol_line_unique_key',
+                        value: lineUnqKey
+                    });
                     salesOrd.commitLine({
                         sublistId: 'item'
                     });
