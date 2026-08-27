@@ -182,7 +182,7 @@ define(['N/ui/serverWidget', 'N/file', 'N/record', 'N/render', 'N/search', 'N/ht
                     const pdfFile = render.xmlToPdf({ xmlString: html1 });
 
                     pdfFile.name = 'AIA_Form_' + tranid + '.pdf';
-                    pdfFile.folder = 784909;
+                    pdfFile.folder = 869775;
                     var fileID = pdfFile.save();
 
                     record.submitFields({type: 'invoice', id: recId, values: {custbody_bc_stored_aia_form: fileID}})
